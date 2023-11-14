@@ -5,14 +5,16 @@ import com.project.ecommerceapplication.resource.ProductResources;
 
 public interface ProductService {
 	
-	ProductResource createProduct(ProductResource productResource);
+	public ProductResource createProduct(ProductResource productResource);
 	
-	ProductResources getAllProducts();
+	public ProductResources getAllProducts();
 
-	ProductResources getAllProductsByCategory(String category);
+	public ProductResources getAllProductsByCategory(String category);
 	
-	ProductResource updateProduct(ProductResource productResource);
+	public ProductResource updateProduct(ProductResource productResource);
 
-	Boolean deleteProduct(Long id);
+	public boolean deleteProduct(Long id);
+	
+	public ProductResource getProductByProductId(Long productId);
 	
 }

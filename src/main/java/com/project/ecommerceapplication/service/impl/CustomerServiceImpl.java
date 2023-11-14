@@ -146,4 +146,34 @@ public class CustomerServiceImpl implements CustomerService {
 		return customerResource;
 		
 	}
+
+	@Override
+	public CustomerRegisterResource getCustomer(Long customerId) {
+		
+		LOGGER.info("Inside CustomerServiceImpl - getCustomer");
+		
+		CustomerRegisterResource response = null;
+		
+		try {
+			
+			Optional<CustomerRegisterEntity> resp = customerRepository.findById(customerId);
+			
+			if(resp.isPresent()) {
+				
+				LOGGER.info("Response from DB - " + resp.get());
+				
+				response = customerMapper.mapEntityToResource(resp.get());
+				
+				LOGGER.info("Mapped Response - " + response);
+				return response;
+				
+			}
+			
+		}catch(Exception e) {
+			LOGGER.error("Error while getCustomer: " + e.getMessage(), e);
+	         throw e;
+		}
+		
+		return null;
+	}
 }

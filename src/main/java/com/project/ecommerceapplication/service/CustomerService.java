@@ -11,6 +11,8 @@ public interface CustomerService {
 	
 	public CustomerRegisterResource login(CustomerLoginResource customerLoginResource);
 
-	public CustomerRegisterResource updateCustomer(@Valid CustomerRegisterResource customerResource);
+	public CustomerRegisterResource updateCustomer(CustomerRegisterResource customerResource);
+	
+	public CustomerRegisterResource getCustomer(Long customerId);
 
 }

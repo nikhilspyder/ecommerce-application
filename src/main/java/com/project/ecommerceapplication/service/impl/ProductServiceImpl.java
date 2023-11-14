@@ -114,6 +114,38 @@ public class ProductServiceImpl implements ProductService {
 	}
 	
 	@Override
+	public ProductResource getProductByProductId(Long productId) {
+
+		LOGGER.info("Inside ProductServiceImpl - getProductByProductId");
+		
+		try {
+			
+			Optional<ProductEntity> response = productRepository.findByProductId(productId);
+			ProductResource productResource = new ProductResource();
+			
+			if(response.isPresent()) {
+				
+				ProductEntity productEntity = response.get();
+					
+				if(Objects.nonNull(productEntity)) {
+					productResource = productMapper.mapEntityToResource(productEntity);
+					LOGGER.info("Product found for productId - " + productId);
+					LOGGER.info("response - " + productResource);
+					
+				}else {
+					LOGGER.info("No Product found for productId - " + productId);
+				}
+	
+				return productResource;
+			}
+		}catch(Exception e) {
+			LOGGER.error("Error while getProductByProductId : " + e.getMessage(), e);
+            throw e;
+		}
+		return null;
+	}
+	
+	@Override
 	public ProductResource updateProduct(ProductResource productResource){
 		
 		LOGGER.info("Inside ProductServiceImpl - updateProduct");
@@ -144,7 +176,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public Boolean deleteProduct(Long id) {
+	public boolean deleteProduct(Long id) {
 		
 		LOGGER.info("Inside ProductServiceImpl - deleteProduct");
 		

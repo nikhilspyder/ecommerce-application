@@ -7,10 +7,12 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.ecommerceapplication.resource.CustomerLoginResource;
@@ -50,6 +52,24 @@ public class CustomerController {
         try{
         	CustomerRegisterResource response = customerService.login(customerResource);
             LOGGER.info("Executed CustomerController - loginCustomer");
+            LOGGER.info("response - " + response);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }catch(Exception e){
+            LOGGER.error("Caught Exception - "+ e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+    }
+    
+    
+    @GetMapping("/getCustomer")
+    public ResponseEntity<?> getCustomer(@RequestParam Long customerId) {
+
+        LOGGER.info("Inside CustomerController - getCustomer");
+
+        try{
+        	CustomerRegisterResource response = customerService.getCustomer(customerId);
+            LOGGER.info("Executed CustomerController - getCustomer");
             LOGGER.info("response - " + response);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }catch(Exception e){

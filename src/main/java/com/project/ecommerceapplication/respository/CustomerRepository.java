@@ -12,7 +12,7 @@ import com.project.ecommerceapplication.entity.CustomerRegisterEntity;
 @Repository
 public interface CustomerRepository extends CrudRepository<CustomerRegisterEntity, Long> {
 
-    @Query(value = "SELECT * FROM customer WHERE customer_email = :customerEmail", nativeQuery = true)
+    @Query(value = "SELECT * FROM customer WHERE customerEmail = :customerEmail", nativeQuery = true)
     Optional<CustomerRegisterEntity> findByCustomerEmail(@Param("customerEmail") String customerEmail);
 
 }
