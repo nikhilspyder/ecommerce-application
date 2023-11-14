@@ -9,4 +9,8 @@ public interface OrderService {
 	
 	public List<OrderResource> placeOrder(List<OrderPlaceResource> orderResourceList);
 
+	public List<OrderResource> getAllOrders();
+
+	public OrderResource getByOrderId(Long orderId);
+
 }

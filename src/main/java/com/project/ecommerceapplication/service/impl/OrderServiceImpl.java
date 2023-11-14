@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -45,6 +46,8 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public List<OrderResource> placeOrder(List<OrderPlaceResource> orderPlaceResourceList) {
+		
+		LOGGER.info("Inside OrderServiceImpl - placeOrder");
 		
 		List<OrderResource> responseOrderResourceList = new ArrayList<>();
 		
@@ -102,6 +105,50 @@ public class OrderServiceImpl implements OrderService {
 		}
 		
 		return responseOrderResourceList;
+	}
+
+	@Override
+	public List<OrderResource> getAllOrders() {
+		
+		LOGGER.info("Inside OrderServiceImpl - getAllOrders");
+		
+		try {
+	        Iterable<OrderEntity> orderEntities = orderRepository.findAll();
+
+	        List<OrderResource> orderResources = new ArrayList<>();
+	        orderEntities.forEach(orderEntity -> {
+	            OrderResource orderResource = orderMapper.mapEntityToResource(orderEntity);
+	            orderResources.add(orderResource);
+	        });
+
+	        return orderResources;
+	    } catch (Exception e) {
+	        LOGGER.error("Error while getAllOrders : " + e.getMessage(), e);
+	        throw e;
+	    }
+		
+	}
+
+	@Override
+	public OrderResource getByOrderId(Long orderId) {
+		
+		LOGGER.info("Inside OrderServiceImpl - getByOrderId");
+
+		OrderResource orderResource = null;
+		
+		try {
+	        Optional<OrderEntity> orderEntity = orderRepository.findById(orderId);
+	        
+	        if(orderEntity.isPresent()) {
+	        	 orderResource = orderMapper.mapEntityToResource(orderEntity.get());
+	        }
+
+	        return orderResource;
+	    } catch (Exception e) {
+	        LOGGER.error("Error while getAllOrders : " + e.getMessage(), e);
+	        throw e;
+	    }
+		
 	}
 
 }
