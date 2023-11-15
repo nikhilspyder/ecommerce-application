@@ -21,8 +21,6 @@ public class OrderEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long orderId;
 	
-//	private long productId;
-	
 	private int productQuantity;
 	
 	private double productPrice;
@@ -34,8 +32,6 @@ public class OrderEntity {
 	private Date shippingDate;
 	
 	private boolean isDelivered;
-	
-//	private Long customerId;
 	
 	@ManyToOne
     @JoinColumn(name = "productId", nullable = false)
@@ -52,15 +48,7 @@ public class OrderEntity {
 	public void setOrderId(Long orderId) {
 		this.orderId = orderId;
 	}
-
-//	public long getProductId() {
-//		return productId;
-//	}
-//
-//	public void setProductId(long productId) {
-//		this.productId = productId;
-//	}
-
+	
 	public int getProductQuantity() {
 		return productQuantity;
 	}
