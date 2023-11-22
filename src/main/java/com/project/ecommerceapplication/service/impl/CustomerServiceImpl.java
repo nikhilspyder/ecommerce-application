@@ -42,7 +42,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     private Lock customerLock = new ReentrantLock();
 
-    @SuppressWarnings("unused")
 	@Transactional
     public CustomerRegisterResource register(CustomerRegisterResource customerRegisterResource) {
         LOGGER.info("Inside CustomerServiceImpl - register");
