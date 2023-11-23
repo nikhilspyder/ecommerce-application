@@ -1,7 +1,9 @@
 package com.project.ecommerceapplication;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -78,13 +80,15 @@ public class OrderControllerTest {
                         .content(orderJson))
         .andExpect(status().isCreated())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$[0].orderId").value(13))
+        .andExpect(jsonPath("$[0].id").value(1))
+        .andExpect(jsonPath("$[0].orderId").value(14))
         .andExpect(jsonPath("$[0].productQuantity").value(2))
         .andExpect(jsonPath("$[0].productPrice").value(1000.99))
         .andExpect(jsonPath("$[0].subTotal").value(2001.98))
         .andExpect(jsonPath("$[0].delivered").value(true))
         .andExpect(jsonPath("$[0].purchaseDate").value(String.valueOf("2023-11-23T03:37:30.111+00:00")))
         .andExpect(jsonPath("$[0].shippingDate").value(String.valueOf("2023-11-23T03:37:30.111+00:00")))
+        .andExpect(jsonPath("$[1].id").value(2))
         .andExpect(jsonPath("$[1].orderId").value(14))
         .andExpect(jsonPath("$[1].productQuantity").value(1))
         .andExpect(jsonPath("$[1].productPrice").value(79.99))
@@ -102,7 +106,8 @@ public class OrderControllerTest {
 
         // Order 1
         OrderResource order1 = new OrderResource();
-        order1.setOrderId(13L);
+        order1.setId(1L);
+        order1.setOrderId(14L);
         order1.setProductQuantity(2);
         order1.setProductPrice(1000.99);
         order1.setSubTotal(2001.98);
@@ -138,6 +143,7 @@ public class OrderControllerTest {
 
         // Order 2
         OrderResource order2 = new OrderResource();
+        order2.setId(2L);
         order2.setOrderId(14L);
         order2.setProductQuantity(1);
         order2.setProductPrice(79.99);
@@ -167,7 +173,8 @@ public class OrderControllerTest {
     public void testGetAllOrders() throws Exception {
         // Mock data for testing
         OrderResource order1 = new OrderResource();
-        order1.setOrderId(13L);
+        order1.setId(1L);
+        order1.setOrderId(14L);
         order1.setProductQuantity(2);
         order1.setProductPrice(1000.99);
         order1.setSubTotal(2001.98);
@@ -188,6 +195,7 @@ public class OrderControllerTest {
         order1.setCustomerId(customer1);
 
         OrderResource order2 = new OrderResource();
+        order2.setId(2L);
         order2.setOrderId(14L);
         order2.setProductQuantity(1);
         order2.setProductPrice(79.99);
@@ -211,16 +219,17 @@ public class OrderControllerTest {
         List<OrderResource> orders = Arrays.asList(order1, order2);
 
         // Mock the orderService.getAllOrders method
-        when(orderService.getAllOrders()).thenReturn(orders);
+        when(orderService.getAllOrders(anyString())).thenReturn(orders);
 
         // Perform the GET request
-        mockMvc.perform(get("/getAllOrders")
+        mockMvc.perform(get("/getAllOrders?customerId=5")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].orderId").value(13))
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].orderId").value(14))
                 .andExpect(jsonPath("$[0].productQuantity").value(2))
                 .andExpect(jsonPath("$[0].productPrice").value(1000.99))
                 .andExpect(jsonPath("$[0].subTotal").value(2001.98))
@@ -228,6 +237,7 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$[0].shippingDate").value(String.valueOf("2023-11-23T03:37:30.111+00:00")))
                 .andExpect(jsonPath("$[0].delivered").value(true))
 
+                .andExpect(jsonPath("$[1].id").value(2))
                 .andExpect(jsonPath("$[1].orderId").value(14))
                 .andExpect(jsonPath("$[1].productQuantity").value(1))
                 .andExpect(jsonPath("$[1].productPrice").value(79.99))
@@ -237,13 +247,16 @@ public class OrderControllerTest {
                 .andExpect(jsonPath("$[1].delivered").value(true));
 
         // Verify that orderService.getAllOrders was called
-        verify(orderService).getAllOrders();
+        verify(orderService).getAllOrders(anyString());
     }
     
     @Test
     public void testGetByOrderId() throws Exception {
+    	
+    	List<OrderResource> responseList = new ArrayList<>();
         // Mock data for testing
         OrderResource order = new OrderResource();
+        order.setId(1L);
         order.setOrderId(1L);
         order.setProductQuantity(2);
         order.setProductPrice(1000.99);
@@ -251,22 +264,25 @@ public class OrderControllerTest {
         order.setPurchaseDate(Date.from(Instant.parse("2023-11-23T03:37:30.111Z")));
         order.setShippingDate(Date.from(Instant.parse("2023-11-23T03:37:30.111Z")));
         order.setDelivered(true);
+        
+        responseList.add(order);
 
         // Mock the orderService.getByOrderId method
-        when(orderService.getByOrderId(anyLong())).thenReturn(order);
+        when(orderService.getByOrderId(anyLong())).thenReturn(responseList);
 
         // Perform the GET request
         mockMvc.perform(get("/getByOrderId/{orderId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.orderId").value(1L))
-                .andExpect(jsonPath("$.productQuantity").value(2))
-                .andExpect(jsonPath("$.productPrice").value(1000.99))
-                .andExpect(jsonPath("$.subTotal").value(2001.98))
-                .andExpect(jsonPath("$.purchaseDate").value(String.valueOf("2023-11-23T03:37:30.111+00:00")))
-                .andExpect(jsonPath("$.shippingDate").value(String.valueOf("2023-11-23T03:37:30.111+00:00")))
-                .andExpect(jsonPath("$.delivered").value(true));
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].orderId").value(1L))
+                .andExpect(jsonPath("$[0].productQuantity").value(2))
+                .andExpect(jsonPath("$[0].productPrice").value(1000.99))
+                .andExpect(jsonPath("$[0].subTotal").value(2001.98))
+                .andExpect(jsonPath("$[0].purchaseDate").value(String.valueOf("2023-11-23T03:37:30.111+00:00")))
+                .andExpect(jsonPath("$[0].shippingDate").value(String.valueOf("2023-11-23T03:37:30.111+00:00")))
+                .andExpect(jsonPath("$[0].delivered").value(true));
 
         // Verify that orderService.getByOrderId was called
         verify(orderService).getByOrderId(1L);

@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +16,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.project.ecommerceapplication.entity.OrderEntity;
 import com.project.ecommerceapplication.mapper.OrderMapper;
@@ -53,6 +55,10 @@ public class OrderServiceImpl implements OrderService {
 		
 		if(!CollectionUtils.isEmpty(orderPlaceResourceList)) {
 			
+			Long orderId = generateOrderId();
+			
+			LOGGER.info(" ** Generated Order id - " + orderId);
+			
 			orderPlaceResourceList.stream().forEach(orderPlaceResource ->{
 				
 				LOGGER.info("Placing Order for Customer - " + orderPlaceResource.getCustomerId());
@@ -68,12 +74,13 @@ public class OrderServiceImpl implements OrderService {
 				
 				CustomerRegisterResource customerResource = customerService.getCustomer(orderPlaceResource.getCustomerId());
 				
-				LOGGER.info(" ** Customer Response - " + customerResource);
+				LOGGER.info("Customer Response - " + customerResource);
 				
 				orderResource.setCustomerId(customerResource);
 				
 				double productPrice = productResource.getPrice();
 				orderResource.setProductPrice(productResource.getPrice());
+				orderResource.setOrderId(orderId);
 				
 				orderResource.setProductQuantity(productQuantity);
 				
@@ -83,7 +90,6 @@ public class OrderServiceImpl implements OrderService {
 				LocalDateTime localDateTime = LocalDateTime.now();
 				Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 				orderResource.setPurchaseDate(date);
-				
 				orderResource.setShippingDate(date);
 				
 				LOGGER.info("Constructed Order Object - " + orderResource);
@@ -107,21 +113,48 @@ public class OrderServiceImpl implements OrderService {
 		return responseOrderResourceList;
 	}
 
+	private Long generateOrderId() {
+		// Create a Random object
+		Random random = new Random();
+
+		// Define the minimum value
+		long minValue = 100000L;
+
+		// Generate a random long within the specified range
+		long orderId = minValue + (long) (random.nextDouble() * Long.MAX_VALUE);
+		return orderId;
+	}
+
+	@SuppressWarnings("deprecation")
 	@Override
-	public List<OrderResource> getAllOrders() {
+	public List<OrderResource> getAllOrders(String customerId) {
 		
 		LOGGER.info("Inside OrderServiceImpl - getAllOrders");
 		
 		try {
-	        Iterable<OrderEntity> orderEntities = orderRepository.findAll();
+			List<OrderResource> orderResources = new ArrayList<>();
+			
+			Iterable<OrderEntity> orderEntities = null;
+			if(StringUtils.isEmpty(customerId)) {
+				orderEntities = orderRepository.findAll();
+				
+				orderEntities.forEach(orderEntity -> {
+					OrderResource orderResource = orderMapper.mapEntityToResource(orderEntity);
+					orderResources.add(orderResource);
+				});
+				
+			}else {
+				Optional<List<OrderEntity>> orderListEntites = orderRepository.findAllOrdersByCustomerId(customerId);
+				if(orderListEntites.isPresent()) {
+					
+					orderListEntites.get().forEach(orderEntity -> {
+						OrderResource orderResource = orderMapper.mapEntityToResource(orderEntity);
+						orderResources.add(orderResource);
+					});
+				}
+			}
 
-	        List<OrderResource> orderResources = new ArrayList<>();
-	        orderEntities.forEach(orderEntity -> {
-	            OrderResource orderResource = orderMapper.mapEntityToResource(orderEntity);
-	            orderResources.add(orderResource);
-	        });
-
-	        return orderResources;
+			return orderResources;
 	    } catch (Exception e) {
 	        LOGGER.error("Error while getAllOrders : " + e.getMessage(), e);
 	        throw e;
@@ -130,20 +163,25 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Override
-	public OrderResource getByOrderId(Long orderId) {
+	public List<OrderResource> getByOrderId(Long orderId) {
 		
 		LOGGER.info("Inside OrderServiceImpl - getByOrderId");
 
-		OrderResource orderResource = null;
+		List<OrderResource> responseList = new ArrayList<>();
 		
 		try {
-	        Optional<OrderEntity> orderEntity = orderRepository.findById(orderId);
+	        Optional<List<OrderEntity>> orderEntityList = orderRepository.findByOrderId(orderId);
 	        
-	        if(orderEntity.isPresent()) {
-	        	 orderResource = orderMapper.mapEntityToResource(orderEntity.get());
+	        OrderResource orderResource;
+			if(orderEntityList.isPresent()) {
+	        	
+	        	for(OrderEntity orderEntity : orderEntityList.get()) {
+	        		orderResource = orderMapper.mapEntityToResource(orderEntity);
+	        		responseList.add(orderResource);
+	        	}
 	        }
 
-	        return orderResource;
+	        return responseList;
 	    } catch (Exception e) {
 	        LOGGER.error("Error while getAllOrders : " + e.getMessage(), e);
 	        throw e;

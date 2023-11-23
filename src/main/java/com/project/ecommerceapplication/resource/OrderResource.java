@@ -10,6 +10,8 @@ import com.project.ecommerceapplication.entity.CustomerRegisterEntity;
 import com.project.ecommerceapplication.entity.ProductEntity;
 
 public class OrderResource {
+	
+	private Long id;
 
 	private Long orderId;
 	
@@ -28,6 +30,14 @@ public class OrderResource {
 	private ProductResource productId;
 
     private CustomerRegisterResource customerId;
+    
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public Long getOrderId() {
 		return orderId;
@@ -103,10 +113,10 @@ public class OrderResource {
 
 	@Override
 	public String toString() {
-		return "OrderResource [orderId=" + orderId + ", productQuantity=" + productQuantity + ", productPrice="
-				+ productPrice + ", subTotal=" + subTotal + ", purchaseDate=" + purchaseDate + ", shippingDate="
-				+ shippingDate + ", isDelivered=" + isDelivered + ", productId=" + productId + ", customerId="
-				+ customerId + "]";
+		return "OrderResource [id=" + id + ", orderId=" + orderId + ", productQuantity=" + productQuantity
+				+ ", productPrice=" + productPrice + ", subTotal=" + subTotal + ", purchaseDate=" + purchaseDate
+				+ ", shippingDate=" + shippingDate + ", isDelivered=" + isDelivered + ", productId=" + productId
+				+ ", customerId=" + customerId + "]";
 	}
 
 }

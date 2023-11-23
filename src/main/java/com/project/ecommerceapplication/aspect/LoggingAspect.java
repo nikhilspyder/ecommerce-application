@@ -19,7 +19,7 @@ public class LoggingAspect {
         long startTime = System.currentTimeMillis();
 
 //        System.out.println(joinPoint.getSignature() + " started at " + startTime + "ms");
-        LOGGER.info(joinPoint.getSignature() + " started at " + startTime + "ms");
+//        LOGGER.info(joinPoint.getSignature() + " started at " + startTime + "ms");
 
         Object result = joinPoint.proceed();
 
@@ -27,7 +27,7 @@ public class LoggingAspect {
         long executionTime = endTime - startTime;
 
 //        System.out.println(joinPoint.getSignature() + " executed in " + executionTime + "ms");
-        LOGGER.info(joinPoint.getSignature() + " executed in " + executionTime + "ms");
+//        LOGGER.info(joinPoint.getSignature() + " executed in " + executionTime + "ms");
 
         return result;
     }

@@ -19,6 +19,8 @@ public class OrderEntity {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
 	private Long orderId;
 	
 	private int productQuantity;
@@ -40,6 +42,14 @@ public class OrderEntity {
     @ManyToOne
     @JoinColumn(name = "customerId", nullable = false)
     private CustomerRegisterEntity customerId;
+    
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public Long getOrderId() {
 		return orderId;
@@ -115,11 +125,10 @@ public class OrderEntity {
 
 	@Override
 	public String toString() {
-		return "OrderEntity [orderId=" + orderId + ", productQuantity=" + productQuantity + ", productPrice="
-				+ productPrice + ", subTotal=" + subTotal + ", purchaseDate=" + purchaseDate + ", shippingDate="
-				+ shippingDate + ", isDelivered=" + isDelivered + ", productId=" + productId + ", customerId="
-				+ customerId + "]";
+		return "OrderEntity [id=" + id + ", orderId=" + orderId + ", productQuantity=" + productQuantity
+				+ ", productPrice=" + productPrice + ", subTotal=" + subTotal + ", purchaseDate=" + purchaseDate
+				+ ", shippingDate=" + shippingDate + ", isDelivered=" + isDelivered + ", productId=" + productId
+				+ ", customerId=" + customerId + "]";
 	}
-
 
 }

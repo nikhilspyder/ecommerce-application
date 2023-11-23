@@ -7,11 +7,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.ecommerceapplication.resource.OrderPlaceResource;
@@ -41,12 +43,12 @@ public class OrderController {
     }
     
     @GetMapping("/getAllOrders")
-    public ResponseEntity<List<OrderResource>> getAllOrders() {
+    public ResponseEntity<List<OrderResource>> getAllOrders(@RequestParam(required = false) String customerId) {
     	
     	LOGGER.info("Inside OrderController - getAllOrders");
     	
     	try {
-    		List<OrderResource> orders = orderService.getAllOrders();
+    		List<OrderResource> orders = orderService.getAllOrders(customerId);
 
             if (!orders.isEmpty()) {
                 return new ResponseEntity<>(orders, HttpStatus.OK);
@@ -60,15 +62,16 @@ public class OrderController {
         
     }
     
+    
     @GetMapping("/getByOrderId/{orderId}")
-    public ResponseEntity<OrderResource> getByOrderId(@PathVariable Long orderId) {
+    public ResponseEntity<?> getByOrderId(@PathVariable Long orderId) {
     	
     	LOGGER.info("Inside OrderController - getByOrderId");
         try {
-            OrderResource order = orderService.getByOrderId(orderId);
+            List<OrderResource> orderResponseList = orderService.getByOrderId(orderId);
 
-            if (order != null) {
-                return new ResponseEntity<>(order, HttpStatus.OK);
+            if (!CollectionUtils.isEmpty(orderResponseList)) {
+                return new ResponseEntity<>(orderResponseList, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
