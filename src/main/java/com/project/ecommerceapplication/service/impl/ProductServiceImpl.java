@@ -1,6 +1,7 @@
 package com.project.ecommerceapplication.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import com.project.ecommerceapplication.entity.ProductEntity;
 import com.project.ecommerceapplication.mapper.CustomerMapper;
 import com.project.ecommerceapplication.mapper.ProductMapper;
+import com.project.ecommerceapplication.resource.ECommerceCategory;
 import com.project.ecommerceapplication.resource.ProductResource;
 import com.project.ecommerceapplication.resource.ProductResources;
 import com.project.ecommerceapplication.respository.CustomerRepository;
@@ -192,6 +194,20 @@ public class ProductServiceImpl implements ProductService {
         	LOGGER.error("Error while deleteProduct : " + e.getMessage(), e);
             return false; 
         }
+	}
+
+	@Override
+	public List<String> getAllCategories() {
+		return Arrays.asList(
+                ECommerceCategory.ELECTRONICS.getDisplayName(),
+                ECommerceCategory.CLOTHING.getDisplayName(),
+                ECommerceCategory.BOOKS.getDisplayName(),
+                ECommerceCategory.HOME_APPLIANCES.getDisplayName(),
+                ECommerceCategory.SPORTS.getDisplayName(),
+                ECommerceCategory.BEAUTY.getDisplayName(),
+                ECommerceCategory.TOYS.getDisplayName(),
+                ECommerceCategory.FURNITURE.getDisplayName()
+        );
 	}
 	
 	

@@ -7,6 +7,7 @@ import com.project.ecommerceapplication.resource.ProductResource;
 import com.project.ecommerceapplication.resource.ProductResources;
 import com.project.ecommerceapplication.service.ProductService;
 
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,20 +17,25 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.*;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 
 @SpringBootTest
@@ -135,6 +141,95 @@ public class ProductControllerTest {
 
         // Verify that productService.getAllProducts was called
         verify(productService).getAllProducts();
+    }
+    
+    @Test
+    public void testGetAllCategories() throws Exception {
+        // Expected list of categories
+        List<String> expectedCategories = Arrays.asList(
+                ECommerceCategory.ELECTRONICS.getDisplayName(),
+                ECommerceCategory.CLOTHING.getDisplayName(),
+                ECommerceCategory.BOOKS.getDisplayName(),
+                ECommerceCategory.HOME_APPLIANCES.getDisplayName(),
+                ECommerceCategory.SPORTS.getDisplayName(),
+                ECommerceCategory.BEAUTY.getDisplayName(),
+                ECommerceCategory.TOYS.getDisplayName(),
+                ECommerceCategory.FURNITURE.getDisplayName()
+        );
+        
+        // Mock the productService.getAllProducts method
+        when(productService.getAllCategories()).thenReturn(expectedCategories);
+
+        // Perform the GET request
+        mockMvc.perform(get("/getAllCategories")
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$").isArray())
+        .andExpect(jsonPath("$").isNotEmpty())
+        .andExpect(jsonPath("$", containsInAnyOrder(expectedCategories.toArray())));
+        
+     // Verify that productService.getAllProducts was called
+        verify(productService).getAllCategories();
+    }
+    
+    @Test
+    public void testUpdateProduct() throws Exception {
+        // Create a ProductResource for testing
+        ProductResource productResource = new ProductResource();
+        productResource.setId(1L);
+        productResource.setName("Updated Product");
+        productResource.setDescription("Updated Description");
+        productResource.setCategory(ECommerceCategory.BOOKS);
+        productResource.setPrice(20.00);
+        productResource.setStock(10);
+
+        // Convert the ProductResource to JSON
+        String productJson = objectMapper.writeValueAsString(productResource);
+
+        // Mock the productService.updateProduct method
+        when(productService.updateProduct(any(ProductResource.class))).thenReturn(productResource);
+
+        // Perform the PUT request
+        mockMvc.perform(put("/updateProduct")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(productJson))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("Updated Product"))
+                .andExpect(jsonPath("$.description").value("Updated Description"))
+                .andExpect(jsonPath("$.category").value(ECommerceCategory.BOOKS.name()))
+                .andExpect(jsonPath("$.price").value(20.00))
+                .andExpect(jsonPath("$.stock").value(10));
+
+        // Verify that productService.updateProduct was called with the expected argument
+        ArgumentCaptor<ProductResource> argumentCaptor = ArgumentCaptor.forClass(ProductResource.class);
+        verify(productService).updateProduct(argumentCaptor.capture());
+
+        // Print the actual argument for debugging
+        System.out.println("Actual Argument: " + argumentCaptor.getValue());
+    }
+    
+    @Test
+    public void testDeleteProduct() throws Exception {
+        // Mock data for testing
+        Long productId = 1L;
+        Boolean deletionResult = true;
+
+        // Mock the productService.deleteProduct method
+        when(productService.deleteProduct(productId)).thenReturn(deletionResult);
+
+        // Perform the DELETE request
+        mockMvc.perform(MockMvcRequestBuilders
+                        .delete("/deleteProduct")
+                        .param("id", productId.toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.content().string(String.valueOf(deletionResult)));
+        
+     // Verify that productService.deleteProduct was called
+      verify(productService).deleteProduct(productId);
     }
     
 }

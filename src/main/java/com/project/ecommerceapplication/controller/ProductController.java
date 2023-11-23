@@ -83,17 +83,20 @@ public class ProductController {
 	}
 	
 	@GetMapping("/getAllCategories")
-    public List<String> getAllCategories() {
-        return Arrays.asList(
-                ECommerceCategory.ELECTRONICS.getDisplayName(),
-                ECommerceCategory.CLOTHING.getDisplayName(),
-                ECommerceCategory.BOOKS.getDisplayName(),
-                ECommerceCategory.HOME_APPLIANCES.getDisplayName(),
-                ECommerceCategory.SPORTS.getDisplayName(),
-                ECommerceCategory.BEAUTY.getDisplayName(),
-                ECommerceCategory.TOYS.getDisplayName(),
-                ECommerceCategory.FURNITURE.getDisplayName()
-        );
+    public ResponseEntity<?> getAllCategories() {
+		
+		LOGGER.info("Inside ProductController - getAllCategories");
+
+        try{
+        	List<String> response = productService.getAllCategories();
+            LOGGER.info("Executed ProductController - getAllCategories");
+            LOGGER.info("response - " + response);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }catch(Exception e){
+            LOGGER.error("Caught Exception - "+ e);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+		
     }
 	
 	@PutMapping("/updateProduct")

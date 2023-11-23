@@ -1,5 +1,7 @@
 package com.project.ecommerceapplication.service;
 
+import java.util.List;
+
 import com.project.ecommerceapplication.resource.ProductResource;
 import com.project.ecommerceapplication.resource.ProductResources;
 
@@ -16,5 +18,7 @@ public interface ProductService {
 	public boolean deleteProduct(Long id);
 	
 	public ProductResource getProductByProductId(Long productId);
+
+	public List<String> getAllCategories();
 	
 }
