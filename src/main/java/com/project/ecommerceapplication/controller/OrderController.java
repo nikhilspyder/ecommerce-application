@@ -2,6 +2,8 @@ package com.project.ecommerceapplication.controller;
 
 import java.util.List;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +26,17 @@ import com.project.ecommerceapplication.service.OrderService;
 @RequestMapping("/")
 public class OrderController {
 	
-	 private static final Logger LOGGER = LogManager.getLogger(OrderController.class);
-
+    private static final Logger LOGGER = LogManager.getLogger(OrderController.class);
+    Counter placeOrderCounter;
+    Counter getOrdersCustomer;
+    public OrderController(MeterRegistry registry) {
+        placeOrderCounter = Counter.builder("place_order_counter")
+                .description("Number of orders places")
+                .register(registry);
+        getOrdersCustomer = Counter.builder("get_all_orders_counter")
+                .description("Number of getAllOrders requests")
+                .register(registry);
+    }
     @Autowired
     private OrderService orderService;
 
@@ -33,7 +44,7 @@ public class OrderController {
     public ResponseEntity<?> placeOrder(@RequestBody List<OrderPlaceResource> orderPlaceResourceList) {
     	
     	LOGGER.info("Inside OrderController - placeOrder");
-    	
+    	placeOrderCounter.increment();
     	try {
 	    	List<OrderResource> order = orderService.placeOrder(orderPlaceResourceList);
 	        return new ResponseEntity<>(order, HttpStatus.CREATED);
@@ -46,7 +57,7 @@ public class OrderController {
     public ResponseEntity<List<OrderResource>> getAllOrders(@RequestParam(required = false) String customerId) {
     	
     	LOGGER.info("Inside OrderController - getAllOrders");
-    	
+    	getOrdersCustomer.increment();
     	try {
     		List<OrderResource> orders = orderService.getAllOrders(customerId);
 

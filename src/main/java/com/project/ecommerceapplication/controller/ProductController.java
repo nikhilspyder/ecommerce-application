@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +32,25 @@ import com.project.ecommerceapplication.service.ProductService;
 @RestController
 @RequestMapping("/")
 public class ProductController {
-	
 	private static final Logger LOGGER = LogManager.getLogger(ProductController.class);
-	
+    Counter createProductCounter;
+    Counter getAllProducts;
+    Counter updateProduct;
+    Counter deleteProduct;
+    public ProductController(MeterRegistry registry) {
+        createProductCounter = Counter.builder("create_product_counter")
+                .description("Number of products created")
+                .register(registry);
+        getAllProducts = Counter.builder("get_all_products_counter")
+                .description("Number of getAllProducts requests")
+                .register(registry);
+        updateProduct = Counter.builder("update_product_counter")
+                .description("Number of update product requests")
+                .register(registry);
+        deleteProduct = Counter.builder("delete_product_counter")
+                .description("Number of delete product requests")
+                .register(registry);
+    }
 	@Autowired
 	private ProductService productService;
 
@@ -41,7 +59,7 @@ public class ProductController {
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductResource productResource) {
 
         LOGGER.info("Inside ProductController - createProduct");
-
+        createProductCounter.increment();
         try{
         	ProductResource response = productService.createProduct(productResource);
             LOGGER.info("Executed ProductController - createProduct");
@@ -59,7 +77,7 @@ public class ProductController {
 		
 		LOGGER.info("Inside ProductController - getAllProducts");
 		ProductResources response;
-
+        getAllProducts.increment();
         try{
         	
         	if(StringUtils.hasText(category)) {
@@ -101,7 +119,7 @@ public class ProductController {
 	
 	@PutMapping("/updateProduct")
     public ResponseEntity<?> updateProduct(@Valid @RequestBody ProductResource productResource) {
-
+        updateProduct.increment();
         LOGGER.info("Inside ProductController - updateProduct");
 
         try{
@@ -118,7 +136,7 @@ public class ProductController {
 	
 	@DeleteMapping("/deleteProduct")
     public ResponseEntity<?> deleteProduct(@RequestParam Long id) {
-
+        deleteProduct.increment();
         LOGGER.info("Inside ProductController - deleteProduct");
 
         try{
